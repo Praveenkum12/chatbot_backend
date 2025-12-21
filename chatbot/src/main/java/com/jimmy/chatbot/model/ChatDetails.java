@@ -4,14 +4,14 @@ import jakarta.persistence.*;
 
 import java.util.UUID;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "chat_details")
 public class ChatDetails {
 

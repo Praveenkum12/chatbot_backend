@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -79,14 +80,53 @@ public class OpenAIController {
 
 
     @PostMapping("/web-search")
-    public ResponseEntity<String> searchOnWeb(@RequestBody ChatDTO chatBody) {
+    public ResponseEntity<ChatDTO> searchOnWeb(@RequestBody ChatDTO chatBody) {
+        String conversationId = chatBody.conversation_id();
+
+        // Create new chat if conversationId is missing
+        if (conversationId == null || conversationId.isBlank()) {
+            String title = basicChatClient.prompt()
+                    .system(titleGeneratorTemplate)
+                    .user(chatBody.message())
+                    .call()
+                    .content();
+
+            ChatDetails chatDetails = chatService.createNewChat(title);
+            conversationId = chatDetails.getId();
+        }
+
+        final String finalConversationId = conversationId;
+
         try {
-            String response = webSearchChatClient.prompt().user(chatBody.message()).call().content();
-            return ResponseEntity.ok(response);
+            String response = webSearchChatClient.prompt()
+                    .advisors(a -> a.param(CONVERSATION_ID, finalConversationId))
+                    .user(chatBody.message())
+                    .call()
+                    .content();
+
+            return ResponseEntity.ok(
+                    ChatDTO.builder()
+                            .conversation_id(finalConversationId)
+                            .message(response)
+                            .build()
+            );
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error: " + e.getMessage());
+                    .body(
+                            ChatDTO.builder()
+                                    .conversation_id(finalConversationId)
+                                    .message("Error: " + e.getMessage())
+                                    .build()
+                    );
         }
     }
+
+    @GetMapping("/history")
+    public List<ChatDetails> getChatHistory() {
+        return chatService.getChatHistory().reversed();
+    }
+
+
 
 }
