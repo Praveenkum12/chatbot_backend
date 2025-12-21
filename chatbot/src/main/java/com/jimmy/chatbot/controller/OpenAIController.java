@@ -1,6 +1,7 @@
 package com.jimmy.chatbot.controller;
 
 import com.jimmy.chatbot.dto.ChatDTO;
+import com.jimmy.chatbot.model.ChatDetails;
 import com.jimmy.chatbot.service.ChatService;
 import org.springframework.ai.chat.client.ChatClient;
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
@@ -34,25 +35,48 @@ public class OpenAIController {
     }
 
     @PostMapping("/chat")
-    public ResponseEntity<String> chatWithOpenAi(@RequestBody ChatDTO chatBody) {
+    public ResponseEntity<ChatDTO> chatWithOpenAi(@RequestBody ChatDTO chatBody) {
+
         String conversationId = chatBody.conversation_id();
 
-        if(conversationId == null) {
-            String title = basicChatClient.prompt().system(titleGeneratorTemplate).user(chatBody.message()).call().content();
-            chatService.createNewChat(title);
-            return ResponseEntity.ok(title);
+        if (conversationId == null || conversationId.isBlank()) {
+            String title = basicChatClient.prompt()
+                    .system(titleGeneratorTemplate)
+                    .user(chatBody.message())
+                    .call()
+                    .content();
+
+            ChatDetails chatDetails = chatService.createNewChat(title);
+            conversationId = chatDetails.getId();
         }
 
+        final String finalConversationId = conversationId;
+
         try {
-            String response = casualChatClient.prompt()
-                    .advisors(a -> a.param(CONVERSATION_ID, "jimmy"))
-                    .user(chatBody.message()).call().content();
-            return ResponseEntity.ok(response);
+            String msg = casualChatClient.prompt()
+                    .advisors(a -> a.param(CONVERSATION_ID, finalConversationId))
+                    .user(chatBody.message())
+                    .call()
+                    .content();
+
+            return ResponseEntity.ok(
+                    ChatDTO.builder()
+                            .conversation_id(finalConversationId)
+                            .message(msg)
+                            .build()
+            );
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                .body("Error: " + e.getMessage());
+                    .body(
+                            ChatDTO.builder()
+                                    .conversation_id(finalConversationId)
+                                    .message("Error: " + e.getMessage())
+                                    .build()
+                    );
         }
     }
+
 
     @PostMapping("/web-search")
     public ResponseEntity<String> searchOnWeb(@RequestBody ChatDTO chatBody) {
