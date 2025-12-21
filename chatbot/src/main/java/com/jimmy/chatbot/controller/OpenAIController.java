@@ -12,20 +12,33 @@ import org.springframework.web.bind.annotation.*;
 public class OpenAIController {
 
 
-    private final ChatClient chatClient;
+    private final ChatClient casualChatClient;
+    private final ChatClient webSearchChatClient;
 
-    public OpenAIController( @Qualifier("openaiChatClient") ChatClient chatClient) {
-        this.chatClient = chatClient;
+    public OpenAIController( @Qualifier("casualChatClient") ChatClient casualChatClient, @Qualifier("webSearchChatClient") ChatClient webSearchChatClient) {
+        this.casualChatClient = casualChatClient;
+        this.webSearchChatClient = webSearchChatClient;
     }
 
     @PostMapping("/chat")
     public ResponseEntity<String> chatWithOpenAi(@RequestBody ChatDTO chatBody) {
         try {
-            String response = chatClient.prompt().user(chatBody.message()).call().content();
+            String response = casualChatClient.prompt().user(chatBody.message()).call().content();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body("Error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/web-search")
+    public ResponseEntity<String> searchOnWeb(@RequestBody ChatDTO chatBody) {
+        try {
+            String response = webSearchChatClient.prompt().user(chatBody.message()).call().content();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error: " + e.getMessage());
         }
     }
 
