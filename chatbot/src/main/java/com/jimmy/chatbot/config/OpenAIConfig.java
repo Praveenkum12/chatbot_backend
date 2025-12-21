@@ -21,7 +21,7 @@ public class OpenAIConfig {
 
     @Bean
     ChatMemory chatMemory(JdbcChatMemoryRepository jdbcChatMemoryRepository) {
-        return MessageWindowChatMemory.builder().maxMessages(10)
+        return MessageWindowChatMemory.builder().maxMessages(500)
                 .chatMemoryRepository(jdbcChatMemoryRepository).build();
     }
 

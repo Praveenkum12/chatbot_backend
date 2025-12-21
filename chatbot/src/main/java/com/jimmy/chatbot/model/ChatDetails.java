@@ -29,6 +29,7 @@ public class ChatDetails {
         }
     }
 }
+
 //----------------------------- TABLE -------------------------------------------------
 
 //CREATE TABLE chat_details (
