@@ -28,7 +28,7 @@ public class OpenAIController {
     private final ChatClient basicChatClient;
     private final ChatService chatService;
 
-    public OpenAIController( @Qualifier("casualChatClient") ChatClient casualChatClient, @Qualifier("webSearchChatClient") ChatClient webSearchChatClient,  @Qualifier("basicChatClient") ChatClient basicChatClient, ChatService chatService) {
+    public OpenAIController(@Qualifier("casualChatClient") ChatClient casualChatClient, @Qualifier("webSearchChatClient") ChatClient webSearchChatClient,  @Qualifier("basicChatClient") ChatClient basicChatClient, ChatService chatService) {
         this.casualChatClient = casualChatClient;
         this.webSearchChatClient = webSearchChatClient;
         this.basicChatClient = basicChatClient;
@@ -124,6 +124,11 @@ public class OpenAIController {
 
     @GetMapping("/history")
     public List<ChatDetails> getChatHistory() {
+        return chatService.getChatHistory().reversed();
+    }
+
+    @GetMapping("/data/{id}")
+    public List<ChatDetails> getChatHistory(@PathVariable("id") String id) {
         return chatService.getChatHistory().reversed();
     }
 
