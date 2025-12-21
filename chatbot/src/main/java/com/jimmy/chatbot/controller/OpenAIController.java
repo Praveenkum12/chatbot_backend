@@ -128,7 +128,7 @@ public class OpenAIController {
 
     @GetMapping("/history")
     public List<ChatDetails> getChatHistory() {
-        return chatService.getChatHistory().reversed();
+        return chatService.getChatHistory();
     }
 
     @GetMapping("/data/{id}")

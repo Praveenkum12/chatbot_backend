@@ -18,7 +18,7 @@ public class ChatService {
     }
 
     public List<ChatDetails> getChatHistory() {
-        return chatRepository.findAll();
+        return chatRepository.findAllByOrderByCreatedAtDesc();
     }
 
 }
