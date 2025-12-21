@@ -34,6 +34,12 @@ public class OpenAIConfig {
                 .build();
     }
 
+    @Bean("basicChatClient")
+    public ChatClient basicChatClient( ChatMemory chatMemory, OpenAiChatModel chatModel) {
+        return ChatClient.builder(chatModel)
+                .build();
+    }
+
     @Bean("webSearchChatClient")
     public ChatClient webSearchChatClient(OpenAiChatModel chatModel,
                                  ChatMemory chatMemory, RestClient.Builder restClientBuilder) {
