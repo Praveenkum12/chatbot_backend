@@ -2,6 +2,8 @@ package com.jimmy.chatbot.controller;
 
 import com.jimmy.chatbot.dto.ChatDTO;
 import com.jimmy.chatbot.model.ChatDetails;
+import com.jimmy.chatbot.model.ChatMemoryDetails;
+import com.jimmy.chatbot.repository.ChatMemoryDetailsRepository;
 import com.jimmy.chatbot.service.ChatService;
 import org.springframework.ai.chat.client.ChatClient;
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
@@ -27,12 +29,14 @@ public class OpenAIController {
     private final ChatClient webSearchChatClient;
     private final ChatClient basicChatClient;
     private final ChatService chatService;
+    private final ChatMemoryDetailsRepository chatMemoryDetailsRepository;
 
-    public OpenAIController(@Qualifier("casualChatClient") ChatClient casualChatClient, @Qualifier("webSearchChatClient") ChatClient webSearchChatClient,  @Qualifier("basicChatClient") ChatClient basicChatClient, ChatService chatService) {
+    public OpenAIController(@Qualifier("casualChatClient") ChatClient casualChatClient, @Qualifier("webSearchChatClient") ChatClient webSearchChatClient,  @Qualifier("basicChatClient") ChatClient basicChatClient, ChatService chatService, com.jimmy.chatbot.repository.ChatMemoryDetailsRepository chatMemoryDetailsRepository) {
         this.casualChatClient = casualChatClient;
         this.webSearchChatClient = webSearchChatClient;
         this.basicChatClient = basicChatClient;
         this.chatService = chatService;
+        this.chatMemoryDetailsRepository = chatMemoryDetailsRepository;
     }
 
     @PostMapping("/chat")
@@ -128,10 +132,9 @@ public class OpenAIController {
     }
 
     @GetMapping("/data/{id}")
-    public List<ChatDetails> getChatHistory(@PathVariable("id") String id) {
-        return chatService.getChatHistory().reversed();
-    }
-
+    public List<ChatMemoryDetails> getChatDetailsById(@PathVariable("id") String id) {
+        return chatMemoryDetailsRepository.findByConversationIdOrderByTimestampAsc(id);
+    }   
 
 
 }
