@@ -37,7 +37,12 @@
             <artifactId>spring-ai-starter-model-chat-memory-repository-jdbc</artifactId>
         </dependency>
 
-		<dependency>
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+        </dependency>
+
+        <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
@@ -46,6 +51,7 @@
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-rag</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-advisors-vector-store</artifactId>
@@ -55,6 +61,7 @@
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-vector-store-qdrant</artifactId>
         </dependency>
+
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-starter-model-openai</artifactId>

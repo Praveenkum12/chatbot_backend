@@ -26,8 +26,12 @@ public class OpenAIConfig {
     }
 
     @Bean("casualChatClient")
-    public ChatClient openaiChatClient(OpenAiChatModel chatModel) {
-        return ChatClient.builder(chatModel).build();
+    public ChatClient openaiChatClient( ChatMemory chatMemory, OpenAiChatModel chatModel) {
+        Advisor memoryAdvisor = MessageChatMemoryAdvisor.builder(chatMemory).build();
+        return ChatClient.builder(chatModel)
+                .defaultAdvisors(List.of(
+                        memoryAdvisor))
+                .build();
     }
 
     @Bean("webSearchChatClient")

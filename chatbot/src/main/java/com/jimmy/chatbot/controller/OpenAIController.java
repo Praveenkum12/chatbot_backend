@@ -2,6 +2,8 @@ package com.jimmy.chatbot.controller;
 
 import com.jimmy.chatbot.dto.ChatDTO;
 import org.springframework.ai.chat.client.ChatClient;
+import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,9 @@ public class OpenAIController {
     @PostMapping("/chat")
     public ResponseEntity<String> chatWithOpenAi(@RequestBody ChatDTO chatBody) {
         try {
-            String response = casualChatClient.prompt().user(chatBody.message()).call().content();
+            String response = casualChatClient.prompt()
+                    .advisors(a -> a.param(CONVERSATION_ID, "jimmy"))
+                    .user(chatBody.message()).call().content();
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
