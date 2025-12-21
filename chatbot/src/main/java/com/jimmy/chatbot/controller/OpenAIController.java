@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/openai")
 public class OpenAIController {
 
-
     private final ChatClient casualChatClient;
     private final ChatClient webSearchChatClient;
 
